@@ -1,0 +1,130 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ReadExcel {
+
+ public static void main(String[] args) {
+  
+   //Map to store distinct data
+   Map dataMap = new HashMap();
+   
+   
+  try
+        {
+            FileInputStream file = new FileInputStream(new File("E:\\excel\\c.xlsx"));
+ 
+            //Create Workbook instance holding reference to .xlsx file
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+ 
+            //Get first sheet from the workbook
+            XSSFSheet sheet = workbook.getSheetAt(0);
+ 
+            //Creating ArrayList for Storing column data
+            ArrayList dataArr = new ArrayList();
+            
+           
+            //Iterate through each rows one by one
+            Iterator<Row> rowIterator = sheet.iterator();
+            while (rowIterator.hasNext()) 
+            {
+                Row row = rowIterator.next();
+                
+                if(row.getRowNum() !=0){
+                 
+                 //For each row, iterate through all the columns
+                    Iterator<Cell> cellIterator = row.cellIterator();
+                     
+                    while (cellIterator.hasNext()) 
+                    {
+                        Cell cell = cellIterator.next();
+                        //Check the cell type and format accordingly
+                        
+                        // Condition to check for 2nd column
+                        if(cell.getColumnIndex() == 1){
+                         
+                         switch (cell.getCellType()) 
+                            {
+                                case Cell.CELL_TYPE_NUMERIC:
+                                   // System.out.print(cell.getNumericCellValue() + "\t\t");
+                                    
+                                    //Stores 2nd column data in ArrayList
+                                    dataArr.add(cell.getNumericCellValue());
+                                    
+                                    //To give the unique data
+                                    dataMap.put(cell.getNumericCellValue(),1);
+                                    //System.out.println(cell.getNumericCellValue());
+                                    break;
+                                case Cell.CELL_TYPE_STRING:
+                                   // System.out.print(cell.getStringCellValue() + "\t\t");
+                                    
+                                  //Stores 2nd column data in ArrayList
+                                    dataArr.add(cell.getStringCellValue());
+                                    
+                                  //To give the unique data
+                                    dataMap.put(cell.getStringCellValue(),1);
+                                   // System.out.println(cell.getStringCellValue));
+                                    break;
+                            }
+                         
+                        }
+                    
+                    }
+                }
+                
+                //System.out.println("");
+            }
+          System.out.println(dataArr);
+          System.out.println(dataMap.keySet());
+            file.close();
+            
+            //For creating a new sheet
+            FileInputStream fis = new FileInputStream(new File("E:\\excel\\c.xlsx"));
+            workbook = new XSSFWorkbook(fis);
+            XSSFSheet spreadsheet = workbook.createSheet("Sheet2");
+            
+            //For creating a new sheet in the same excel file.
+            sheet = workbook.getSheetAt(1);
+            
+            //For creating a row in the new sheet.
+            XSSFRow row1 = sheet.createRow(0);
+   
+            //Create 1st cell in the row
+            XSSFCell r1c1 = row1.createCell(0);
+            
+            //Set a value in 1st cell
+   r1c1.setCellValue("Num of Unique Data");
+   
+   //Create 2nd cell in the row
+   XSSFCell r1c2 = row1.createCell(1);
+   
+   //set a value for 2nd cell
+   r1c2.setCellValue(dataMap.size());
+   
+   fis.close();
+   
+   
+   FileOutputStream fos =new FileOutputStream(new File("E:\\excel\\c.xlsx"));
+        workbook.write(fos);
+   
+         fos.close();
+   System.out.println("Sheet Created.........");
+        } 
+        catch (Exception e) 
+        {
+           e.printStackTrace();
+        }
+
+ }
+
+}
